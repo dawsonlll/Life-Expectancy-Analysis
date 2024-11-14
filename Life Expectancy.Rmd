@@ -1,0 +1,427 @@
+---
+title: "final p3"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r, message=FALSE,echo=FALSE,warning=FALSE, include=FALSE}
+
+install.packages("gridExtra")
+install.packages("car")
+install.packages("kableExtra")
+
+library(tidyverse)
+library(latex2exp)
+library(gridExtra)
+set.seed(1007934844)
+Life_Expectancy_Data = read_csv("/Users/dingshuo/Desktop/Life_Expectancy_Data clean final.csv")
+attach(Life_Expectancy_Data)
+data1=na.omit(Life_Expectancy_Data)
+rows <- sample(1:1638,819, replace=FALSE)
+train<-data1[rows,]
+test=data1[-rows,]
+```
+
+```{r, message=FALSE,echo=FALSE,warning=FALSE}
+summary(train[,c(2,5,6,7,8,9,10,11,12,13,14)])
+
+```
+
+```{r, message=FALSE,echo=FALSE,warning=FALSE}
+summary(test[,c(2,5,6,7,8,9,10,11,12,13,14)])
+
+```
+
+
+
+```{r, message=FALSE,echo=FALSE,warning=FALSE}
+attach(train)
+par(mfrow=c(2,2))
+hist(`Year`, main="Year", col="light blue")
+hist(`Life expectancy`, main="Life expectancy", col="light blue")
+hist(`Adult Mortality`, main="Adult Mortality", col="light blue")
+hist(`infant deaths`, main="infant deaths", col="light blue")
+hist(`Alcohol`, main="Alcohol", col="light blue")
+hist(`Hepatitis B`, main="Hepatitis B", col="light blue")
+hist(`BMI`, main="BMI", col="light blue")
+hist(`HIV/AIDS`, main="HIV/AIDS", col="light blue")
+hist(`GDP`, main="GDP", col="light blue")
+hist(`Population`, main="Population", col="light blue")
+hist(`Schooling`, main="Schooling", col="light blue")
+boxplot(`Developing`, main="Developing")
+boxplot(`Developed`, main="Developed")
+
+library(ggplot2)
+a=ggplot(data=train, aes(x=`Adult Mortality`,y=`Life expectancy` ))+
+  geom_point()+
+  geom_smooth(method = lm, se = FALSE)+
+  labs(x='Adult Mortality',y='Life expectancy',
+       title = "Life expectancy VS Adult Mortality")
+
+library(ggplot2)
+b=ggplot(data=train, aes(x=`infant deaths`,y=`Life expectancy` ))+
+  geom_point()+
+  geom_smooth(method = lm, se = FALSE)+
+  labs(x='infant deaths',y='Life expectancy',
+       title = "Infant deaths VS Life expectancy")
+
+library(ggplot2)
+c=ggplot(data=train, aes(x=`Alcohol`,y=`Life expectancy` ))+
+  geom_point()+
+  geom_smooth(method = lm, se = FALSE)+
+  labs(x='Alcohol',y='Life expectancy',
+       title = "Alcohol VS Life expectancy")
+
+library(ggplot2)
+d=ggplot(data=train, aes(x=`BMI`,y=`Life expectancy` ))+
+  geom_point()+
+  geom_smooth(method = lm, se = FALSE)+
+  labs(x=' BMI ',y='Life expectancy',
+       title = " BMI VS Life expectancy")
+
+library(ggplot2)
+e=ggplot(data=train, aes(x=`HIV/AIDS`,y=`Life expectancy` ))+
+  geom_point()+
+  geom_smooth(method = lm, se = FALSE)+
+  labs(x='HIV/AIDS',y='Life expectancy',
+       title = " HIV/AIDS VS Life expectancy")
+
+library(ggplot2)
+f=ggplot(data=train, aes(x=`GDP`,y=`Life expectancy` ))+
+  geom_point()+
+  geom_smooth(method = lm, se = FALSE)+
+  labs(x='GDP',y='Life expectancy',
+       title = " GDP VS Life expectancy")
+
+library(ggplot2)
+g=ggplot(data=train, aes(x=`Population`,y=`Life expectancy` ))+
+  geom_point()+
+  geom_smooth(method = lm, se = FALSE)+
+  labs(x='Population',y='Life expectancy',
+       title = " Population VS Life expectancy")
+
+library(ggplot2)
+h=ggplot(data=train, aes(x=`Schooling`,y=`Life expectancy` ))+
+  geom_point()+
+  geom_smooth(method = lm, se = FALSE)+
+  labs(x='Schooling',y='Life expectancy',
+       title = " Schooling VS Life expectancy")
+
+library(ggplot2)
+i=ggplot(data=train, aes(x=`Year`,y=`Life expectancy` ))+
+  geom_point()+
+  geom_smooth(method = lm, se = FALSE)+
+  labs(x='Year',y='Life expectancy',
+       title = " Year VS Life expectancy")
+
+grid.arrange(a,b,nrow=1)
+grid.arrange(c,d,nrow=1)
+grid.arrange(e,f,nrow=1)
+grid.arrange(g,h,nrow=1)
+grid.arrange(i,nrow=1)
+
+
+
+```
+
+
+
+
+```{r, message=FALSE,echo=FALSE,warning=FALSE}
+library(kableExtra)
+m1 <- lm(`Life expectancy` ~ Year + `Developing` + `Developed` + 
+              `Adult Mortality` + `infant deaths` + Alcohol + `Hepatitis B` + 
+              BMI + `HIV/AIDS` + GDP + Population + `Schooling`, 
+            data=train)
+summary(m1)
+
+
+```
+
+
+
+```{r, message=FALSE,echo=FALSE,warning=FALSE}
+library(kableExtra)
+m2 <- lm(`Life expectancy` ~ Year + `Adult Mortality` + BMI + `HIV/AIDS` + GDP 
+         + `Schooling`, data=train)
+summary(m2)
+
+```
+
+
+```{r, message=FALSE,echo=FALSE,warning=FALSE}
+# F test
+anova(m2)
+```
+
+
+
+```{r, message=FALSE,echo=FALSE,warning=FALSE}
+#partial F
+m3=lm(`Life expectancy` ~  + `Adult Mortality` + BMI + `HIV/AIDS` + GDP 
+      + `Schooling`, data=train)
+summary(m3)
+anova(m2,m3)
+```
+
+
+
+```{r, message=FALSE,echo=FALSE,warning=FALSE}
+#partial F
+m4=lm(`Life expectancy` ~ Year + `HIV/AIDS` + GDP + `Schooling`, data=train)
+summary(m4)
+anova(m2,m4)
+```
+
+```{r, message=FALSE,echo=FALSE,warning=FALSE}
+#partial F
+m5=lm(`Life expectancy` ~ `Adult Mortality` + BMI + `HIV/AIDS`, data=train)
+summary(m5)
+anova(m2,m5)
+```
+
+```{r, message=FALSE,echo=FALSE,warning=FALSE}
+#partial F
+m6=lm(`Life expectancy` ~ + BMI + `HIV/AIDS` + Schooling, data = train)
+summary(m6)
+anova(m2,m6)
+```
+
+
+```{r, message=FALSE,echo=FALSE,warning=FALSE}
+#check condition 1 and 2
+r<-resid(m2)
+plot(train$`Life expectancy`~fitted(m2),main="Y vs Y-hat", xlab="Y-hat", ylab="Y")
+abline(a=0,b=1)
+lines(lowess(train$`Life expectancy`~fitted(m2)),lty=2)
+#condition2
+data2 = data.frame(`Life expectancy`,Year, `Adult Mortality`,
+                   BMI,`HIV/AIDS`,GDP,`Schooling`)
+pairs(data2)
+```
+
+
+
+```{r, message=FALSE,echo=FALSE,warning=FALSE}
+par(mfrow=c(2,2))
+plot(m2, 1)
+plot(m2, 2)
+plot(m2, 3)
+plot(m2, 4)
+
+```
+
+
+
+```{r, message=FALSE,echo=FALSE,warning=FALSE}
+par(mfrow=c(3,3))
+plot(resid(m2) ~ train$Year, xlab='Year', ylab='residuals')
+plot(resid(m2) ~ train$`Adult Mortality`, xlab='Adult Mortality', 
+     ylab='residuals')
+plot(resid(m2) ~ train$BMI, xlab='BMI', ylab='residuals')
+plot(resid(m2) ~ train$`HIV/AIDS`, xlab='HIV/AIDS', ylab='residuals')
+plot(resid(m2) ~ train$GDP, xlab='GDP', ylab='residuals')
+plot(resid(m2) ~ train$Schooling, xlab='Schooling', ylab='residuals')
+qqnorm(resid(m2))
+qqline(resid(m2))
+```
+
+
+```{r, message=FALSE,echo=FALSE,warning=FALSE}
+#find outlier
+r <- rstandard(m2)
+out <- which(r > 4 | r < -4)
+out
+
+```
+
+```{r, message=FALSE,echo=FALSE,warning=FALSE}
+# determine the leverage points
+n <- nrow(train)
+p <- length(coef(m2))-1
+h_cut <- 2*(p+1)/n
+which(hatvalues(m2) >h_cut)
+
+```
+
+```{r, message=FALSE,echo=FALSE,warning=FALSE}
+# cook distance
+D_cut <- qf(0.5, p+1, n-p-1)
+which(cooks.distance(m2) > D_cut)
+
+```
+
+```{r}
+fits_cut <- 2*sqrt((p+1)/n)
+which(abs(dffits(m2)) > fits_cut)
+```
+
+```{r}
+beta_cut <- 2/sqrt(n) 
+for (i in 1:6) {
+  print(paste0("beta ", i-1))
+  print(which(abs(dfbetas(m3)[,i]) > beta_cut))
+}
+```
+
+```{r}
+install.packages("MASS")
+library(MASS)
+library(car)
+vif(m2)
+```
+
+
+
+
+```{r, message=FALSE,echo=FALSE,warning=FALSE}
+#check condition 1 and 2
+m7 = lm(`Life expectancy` ~ Year + `Adult Mortality` + BMI + `HIV/AIDS` + GDP 
+         + `Schooling`, data=test)
+summary(m7)
+r<-resid(m7)
+plot(test$`Life expectancy`~fitted(m7),main="Y vs Y-hat", xlab="Y-hat", ylab="Y")
+abline(a=0,b=1)
+lines(lowess(test$`Life expectancy`~fitted(m7)),lty=2)
+#condition2
+data3 = data.frame(test$`Life expectancy`,test$Year, test$`Adult Mortality`,
+                   test$BMI,test$`HIV/AIDS`,test$GDP,test$`Schooling`)
+pairs(data3)
+```
+
+```{r, message=FALSE,echo=FALSE,warning=FALSE}
+par(mfrow=c(2,2))
+plot(m7, 1)
+plot(m7, 2)
+plot(m7, 3)
+plot(m7, 4)
+```
+
+```{r, message=FALSE,echo=FALSE,warning=FALSE}
+par(mfrow=c(3,3))
+plot(resid(m7) ~ test$Year, xlab='Year', ylab='residuals')
+plot(resid(m7) ~ test$`Adult Mortality`, xlab='Adult Mortality', 
+     ylab='residuals')
+plot(resid(m7) ~ test$BMI, xlab='BMI', ylab='residuals')
+plot(resid(m7) ~ test$`HIV/AIDS`, xlab='HIV/AIDS', ylab='residuals')
+plot(resid(m7) ~ test$GDP, xlab='GDP', ylab='residuals')
+plot(resid(m7) ~ test$Schooling, xlab='Schooling', ylab='residuals')
+qqnorm(resid(m7))
+qqline(resid(m7))
+```
+
+```{r, message=FALSE,echo=FALSE,warning=FALSE}
+#find outlier
+r <- rstandard(m7)
+out <- which(r > 4 | r < -4)
+out
+
+```
+
+```{r, message=FALSE,echo=FALSE,warning=FALSE}
+# determine the leverage points
+n <- nrow(test)
+p <- length(coef(m7))-1
+h_cut <- 2*(p+1)/n
+which(hatvalues(m2) >h_cut)
+
+```
+
+```{r, message=FALSE,echo=FALSE,warning=FALSE}
+# cook distance
+D_cut <- qf(0.5, p+1, n-p-1)
+which(cooks.distance(m7) > D_cut)
+
+```
+
+```{r}
+fits_cut <- 2*sqrt((p+1)/n)
+which(abs(dffits(m7)) > fits_cut)
+```
+```{r}
+beta_cut <- 2/sqrt(n) 
+for (i in 1:6) {
+  print(paste0("beta ", i-1))
+  print(which(abs(dfbetas(m7)[,i]) > beta_cut))
+}
+```
+
+```{r}
+install.packages("MASS")
+library(MASS)
+library(car)
+vif(m7)
+```
+
+
+
+
+
+```{r}
+SSres <- sum(m2$residuals^2)
+Rsq <- summary(m2)$r.squared
+Rsq_adj <- summary(m2)$adj.r.squared
+p <- length(m2$coefficients)
+AIC <- n * log(SSres/n) + 2 * p
+AICc <- AIC + (2 * (p + 2) * (p + 3) / (n - p - 1))
+BIC <- n * log(SSres/n) + (p + 2) * log(n)
+res2 = c(SSres, Rsq, Rsq_adj, AIC, AICc, BIC)
+res2
+
+SSres <- sum(m3$residuals^2)
+Rsq <- summary(m3)$r.squared
+Rsq_adj <- summary(m3)$adj.r.squared
+p <- length(m3$coefficients)
+AIC <- n * log(SSres/n) + 2 * p
+AICc <- AIC + (2 * (p + 2) * (p + 3) / (n - p - 1))
+BIC <- n * log(SSres/n) + (p + 2) * log(n)
+res3 = c(SSres, Rsq, Rsq_adj, AIC, AICc, BIC)
+res3
+
+SSres <- sum(m4$residuals^2)
+Rsq <- summary(m4)$r.squared
+Rsq_adj <- summary(m4)$adj.r.squared
+p <- length(m4$coefficients)
+AIC <- n * log(SSres/n) + 2 * p
+AICc <- AIC + (2 * (p + 2) * (p + 3) / (n - p - 1))
+BIC <- n * log(SSres/n) + (p + 2) * log(n)
+res4 = c(SSres, Rsq, Rsq_adj, AIC, AICc, BIC)
+res4
+
+SSres <- sum(m5$residuals^2)
+Rsq <- summary(m5)$r.squared
+Rsq_adj <- summary(m5)$adj.r.squared
+p <- length(m5$coefficients)
+AIC <- n * log(SSres/n) + 2 * p
+AICc <- AIC + (2 * (p + 2) * (p + 3) / (n - p - 1))
+BIC <- n * log(SSres/n) + (p + 2) * log(n)
+res5 = c(SSres, Rsq, Rsq_adj, AIC, AICc, BIC)
+res5
+
+SSres <- sum(m6$residuals^2)
+Rsq <- summary(m6)$r.squared
+Rsq_adj <- summary(m6)$adj.r.squared
+p <- length(m6$coefficients)
+AIC <- n * log(SSres/n) + 2 * p
+AICc <- AIC + (2 * (p + 2) * (p + 3) / (n - p - 1))
+BIC <- n * log(SSres/n) + (p + 2) * log(n)
+res6 = c(SSres, Rsq, Rsq_adj, AIC, AICc, BIC)
+res6
+
+SSres <- sum(m7$residuals^2)
+Rsq <- summary(m7)$r.squared
+Rsq_adj <- summary(m7)$adj.r.squared
+p <- length(m7$coefficients)
+AIC <- n * log(SSres/n) + 2 * p
+AICc <- AIC + (2 * (p + 2) * (p + 3) / (n - p - 1))
+BIC <- n * log(SSres/n) + (p + 2) * log(n)
+res7 = c(SSres, Rsq, Rsq_adj, AIC, AICc, BIC)
+res7
+```
+
